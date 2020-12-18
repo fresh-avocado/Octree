@@ -28,12 +28,16 @@ struct Punto{
         return answer;
     }
 
-    Punto operator/ (const int& n) {
-        Punto answer;
-        answer.x = (this->x/n);
-        answer.y = (this->y/n);
-        answer.z = (this->z/n);
-        return answer;
+    // Punto operator/ (const int& n) {
+    //     Punto answer;
+    //     answer.x = (int)(this->x/n);
+    //     answer.y = (int)(this->y/n);
+    //     answer.z = (int)(this->z/n);
+    //     return answer;
+    // }
+
+    friend bool operator== (const Punto& lhs, const Punto& rhs) {
+        return lhs.x == rhs.x && lhs.y == rhs.y && lhs.z == rhs.z;        
     }
 
 };
@@ -54,17 +58,46 @@ struct Plano{
     //parametricas 
 
     pair<float, float> xy_with_given_z(float z){
-        float t = (z - zm)/zt;
 
-        float x = xm + (xt*t);
-        float y = ym + (yt*t);
+        float x = xm + (xt*((z - zm)/zt));
+        float y = ym + (yt*((z - zm)/zt));
 
 
         return {x,y};
     }
 
 
+    int getMinZ() {
+        return min({l1a.z, l1b.z, l2a.z, l2b.z});
+    }
 
+    int getMaxZ() {
+        return max({l1a.z, l1b.z, l2a.z, l2b.z});
+    }
+
+    pair<float,float> find_line(Punto A, Punto B) {
+        float a1 = B.y - A.y;
+        float b1 = A.x - B.x;
+        float c1 = a1*A.x + b1*A.y;
+        rxm = (a1*-1)/b1;
+        b = c1/b1;
+        //cout << rxm << "x + " << b;
+        return {rxm, b};
+    }
+
+    pair<float,float> find_line_given_z( float z) {
+
+        auto xy = xy_with_given_z(z);
+
+        float diff_x = l2b.x - xy.first;
+        float diff_y = l2b.y - xy.second;
+
+        Punto l2b_aux(xy.first, xy.second, z);
+        Punto l2a_aux(l2a.x - diff_x, l2a.y - diff_y, z);
+
+       //cout << "l2b_aux = {" << l2b_aux.x << "," << l2b_aux.y << "} l2a_aux = {"  << l2a_aux.x << "," << l2a_aux.y << "}";
+
+    }
 
     Plano(Punto l1a_, Punto l1b_, Punto l2a_, Punto l2b_) : l1a{l1a_}, l1b{l1b_}, l2a{l2a_}, l2b{l2b_} {
         
@@ -76,11 +109,11 @@ struct Plano{
         xt = l2b.x - l1b.x;
         yt = l2b.y - l1b.y;
         zt = l2b.z - l1b.z;
-
         //aqui hallo variables para la ecuacion de la recta 2d (l2b, l2a)
-
-        rxm = (l2b.y - l2a.y) / (l2b.x - l2a.x);
+        find_line(l2b, l2a);
     }
+
+
 
     
 

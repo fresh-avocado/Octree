@@ -4,36 +4,37 @@
 #include <bits/stdc++.h>
 #include "CImg.h"
 #include "Punto.h"
+#include "funciones.h"
 
 using namespace std;
 using namespace cimg_library;
 
 // el numero de imagenes de tipo .bmp
-const int N = 345;
+static const int N = 345;
 
 class Cubo {
-    CImg<char>* images[N];
+    CImg<float>* images[N];
 public: 
     Cubo(const string& f) {
         ifstream file(f.c_str());
         if (file.is_open()) {
             string path;
             int i = 0;
-            while (getline(file, path)) {
-                CImg<char>* img = new CImg<char>(path.c_str());
-                images[i++] = img;
+            while (getline(file, path)) {                
+                auto img = CImg<float>(path.c_str());
+                images[i++] = binarizar(img, 128);
             }
             file.close();
         }
     }
 
-    CImg<char>& getCorte(Punto p1, Punto p2, Punto p3, Punto p4) {
+    CImg<float>& getCorte(Punto p1, Punto p2, Punto p3, Punto p4) {
         Plano p(p1, p2, p3, p4);
 
-        CImg<char> result(N, N);
+        CImg<float>* result = new CImg<float>(N, N);
 
-        result.display();
-        return result;
+        // result->display();
+        // return result;
         
         int zi = p.getMaxZ();
         int zf = p.getMinZ();
@@ -44,11 +45,11 @@ public:
         }
 
         for (int i = zi; i <= zf; ++i) {
-            CImg<char> img = *images[i];
-            // pintar la linea
+            CImg<float> img = *images[i];
+            // TODO: pintar la linea
 
         }
-        return result;
+        return *result;
     }
 
     ~Cubo() {
