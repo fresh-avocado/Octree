@@ -10,7 +10,7 @@ using namespace std;
 using namespace cimg_library;
 
 // el numero de imagenes de tipo .bmp
-static const int N = 345;
+static const int N = 36;
 
 class Cubo {
     CImg<float>* images[N];
@@ -30,8 +30,6 @@ public:
 
     CImg<float>* getCorte(Punto p1, Punto p2, Punto p3, Punto p4) {
         Plano p(p1, p2, p3, p4);
-
-        CImg<float>* result = new CImg<float>(512, 512);
         
         int zi = p.getMinZ();
         int zf = p.getMaxZ();
@@ -39,6 +37,23 @@ public:
         int xf = p.getMaxX();
         int yi = p.getMinY();
         int yf = p.getMaxY();
+
+        // int limit1, limit2;
+
+        // if (yi == yf) { 
+        //     limit1 = xf-xi;
+        //     limit2 = zf-zi;
+        // } else if (zi == zf) { 
+        //     limit1 = 
+        // } else if (xi == xf) {
+
+        // } else {
+        //     // inclinado
+        //     // chequear qué planos atraviesa
+        //     cout << "plano inclinado\n";
+        // }
+
+        CImg<float>* result = new CImg<float>(512, 512);
 
         if (zi == zf) {
             // la imagen en la posicion z
@@ -57,15 +72,16 @@ public:
                 for (int k = yi; k <= yf; ++k) {
                     (*result)(cont_x, cont_y) = (*img)(j, k);
                     // (*result)(j-xi, i-zi) = (*img)(j, k);
-                    cout << "x: " << j << ", y: " << k << ", z: " << i << '\n';
+                    // cout << "x: " << j << ", y: " << k << ", z: " << i << '\n';
                 }
                 cont_x++;
                 // cont_y = 0;
             }
-            // cont_x = 0;
+            cont_x = 0;
             cont_y++;
             // cont_x++;
         }
+        cout << "cont_x: " << cont_x << " cont_y: " << cont_y << endl;
 
         // hallar puntos de interseccion entre imagen y el plano
         // hallar m y b a partir de esos dos puntos
@@ -95,7 +111,7 @@ public:
 
     ~Cubo() {
         printf("Destruyendo cubo\n");
-        for (int i = 0; i < 345; ++i) {
+        for (int i = 0; i < N; ++i) {
             if (images[i]) {
                 printf("Destroying %d image\n", i);
                 delete images[i];

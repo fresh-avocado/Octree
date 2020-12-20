@@ -401,9 +401,9 @@ struct Plano{
             y = y1 + B3 * t
             z = z1 + C3 * t
 */
-        if(coor)
+        // if(coor)
 
-
+    
     }
 
 

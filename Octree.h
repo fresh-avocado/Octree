@@ -8,7 +8,7 @@
 #include "funciones.h"
 
 // el numero de imagenes de tipo .bmp
-static const int M = 345;
+static const int M = 36;
 
 class Octree {
     nodo* root{0};
@@ -75,7 +75,7 @@ public:
             int minY = node->i.y;
             int maxY = node->f.y;
 
-            // no me convence
+            // FIXME: arreglar con lo de pasto
             for (int i = minX; i <= maxX; ++i) {
                 for (int j = minY; j <= maxY; ++j) {
                     // puede ser que en result no se tenga que pintar en (i, j)
