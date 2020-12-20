@@ -1,6 +1,5 @@
 #include <bits/stdc++.h>
 
-// #include "Octree.h"
 #include "CImg.h"
 #include "Cubo.h"
 #include "Octree.h"
@@ -10,22 +9,37 @@ using namespace std;
 
 
 int main() {
-    // Cubo* cubo = new Cubo("files.txt");
 
-    // // cada imagen es 512x512
+    Cubo* cubo = new Cubo("files.txt");
 
-    // Punto p1 = Punto(0, 511, 2);
-    // Punto p2 = Punto(0, 511, 2);
-    // Punto p3 = Punto(0, 511, 2);
-    // Punto p4 = Punto(0, 511, 2);
+    // cada imagen es 512x512
 
-    // // cubo.getCorte(p1, p2, p3, p4).display();
+    Punto p1 = Punto(0, 255, 344);
+    Punto p2 = Punto(511, 255, 344);
+    Punto p3 = Punto(0, 255, 0);
+    Punto p4 = Punto(511, 255, 0);
 
-    // delete cubo;
+    cubo->getCorte(p1, p2, p3, p4)->display();
 
-    Octree* octree = new Octree("files.txt");
+    delete cubo;
 
-    delete octree;
+    // Octree* octree = new Octree("files.txt");
+    // octree->getCorte(p1, p2, p3, p4)->display(); // corte transversal
+    // delete octree;
+
+    // Plano* plano = new Plano(p1, p2, p3, p4);
+
+    // Punto i = Punto(2, 2, 2);
+    // Punto f = Punto(400, 400, 400);
+
+    // Punto i = Punto(255, 255, 0);
+    // Punto f = Punto(512, 512, 5);
+
+    // nodo* node = new nodo(i, f);
+
+    // cout << plano->intersects(node) << '\n';
+
+    // delete plano;
 
     return 0;
 }

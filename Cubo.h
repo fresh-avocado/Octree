@@ -28,28 +28,69 @@ public:
         }
     }
 
-    CImg<float>& getCorte(Punto p1, Punto p2, Punto p3, Punto p4) {
+    CImg<float>* getCorte(Punto p1, Punto p2, Punto p3, Punto p4) {
         Plano p(p1, p2, p3, p4);
 
-        CImg<float>* result = new CImg<float>(N, N);
-
-        // result->display();
-        // return result;
+        CImg<float>* result = new CImg<float>(512, 512);
         
-        int zi = p.getMaxZ();
-        int zf = p.getMinZ();
+        int zi = p.getMinZ();
+        int zf = p.getMaxZ();
+        int xi = p.getMinX();
+        int xf = p.getMaxX();
+        int yi = p.getMinY();
+        int yf = p.getMaxY();
 
         if (zi == zf) {
             // la imagen en la posicion z
-            return *images[zi];
+            return images[zi];
         }
 
+        cout << "zi: " << zi << " zf: " << zf << " xi: " << xi << " xf: " << xf << " yi: " << yi << " yf: " << yf << endl;
+
+        // return result;
+        int cont_x = 0;
+        int cont_y = 0;
+        // Creemos que este código está de másx
         for (int i = zi; i <= zf; ++i) {
-            CImg<float> img = *images[i];
-            // TODO: pintar la linea
-
+            CImg<float>* img = images[i];
+            for (int j = xi; j <= xf; ++j) {
+                for (int k = yi; k <= yf; ++k) {
+                    (*result)(cont_x, cont_y) = (*img)(j, k);
+                    // (*result)(j-xi, i-zi) = (*img)(j, k);
+                    cout << "x: " << j << ", y: " << k << ", z: " << i << '\n';
+                }
+                cont_x++;
+                // cont_y = 0;
+            }
+            // cont_x = 0;
+            cont_y++;
+            // cont_x++;
         }
-        return *result;
+
+        // hallar puntos de interseccion entre imagen y el plano
+        // hallar m y b a partir de esos dos puntos
+
+        // Caso amarillo 
+        // for (int i = zi; i <= zf; ++i) {
+        //     CImg<float>* img = images[i];
+        //     Punto p1 (0, 0, i);
+        //     Punto p2 (512, 512, i);
+        //     Punto p3 (0, 512, i);
+        //     Punto p4 (512, 0, i);
+        //     Plano p_img (p1, p2, p3, p4);
+
+        //     auto inter = interseccion(p_img, p);
+        //     auto m_b = m_y_b(inter);
+        //     int m = m_b.first;
+        //     int b = m_b.second;
+
+        //     for (int j = xi; j <= xf; ++j) {
+        //         int y = m*j + b;
+        //         (*result)(j, y) = (*img)(j, y);
+        //     }
+        // }
+
+        return result;
     }
 
     ~Cubo() {
