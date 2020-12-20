@@ -21,4 +21,19 @@ CImg<float>* binarizar(CImg<float>& img, int umbral) {
     return R; 
 } 
 
+enum Color {
+    ROJO = 31,
+    VERDE = 32,
+    AMARILLO = 33,
+    AZUL = 34,
+};
+
+void print_with_color(Color color, const string& str) {
+    cout << "\033[1;" << color << "m"<< str << "\033[0m\n";
+}
+
+void print_colorful(Color color, const string& str) {
+    cout << "\033[1;" << color << "m"<< str << "\033[0m";
+}
+
 #endif

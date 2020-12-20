@@ -5,169 +5,91 @@
 #include "Octree.h"
 #include "funciones.h"
 
-using namespace std;
+#define OCTREE 1
+#define CUBO 2
 
+using namespace std;
 
 int main() {
 
-    // Cubo* cubo = new Cubo("files.txt");
+    int ed;
 
-    // cada imagen es 512x512
+    print_with_color(VERDE, "Octree (1) o Cubo (2)?");
 
-    Punto p1 = Punto(0, 255, 35);
-    Punto p2 = Punto(511, 255, 35);
-    Punto p3 = Punto(0, 255, 0);
-    Punto p4 = Punto(511, 255, 0);
+    cin >> ed;
 
-    // cubo->getCorte(p1, p2, p3, p4)->display();
+    // paralelo al plano XZ
+    // Punto p1 = Punto(0, 255, 35);
+    // Punto p2 = Punto(511, 255, 35);
+    // Punto p3 = Punto(0, 255, 0);
+    // Punto p4 = Punto(511, 255, 0);
 
-    // delete cubo;
+    // paralelo al plano YZ
+    // Punto p1 = Punto(250, 0, 35);
+    // Punto p2 = Punto(250, 511, 35);
+    // Punto p3 = Punto(250, 0, 0);
+    // Punto p4 = Punto(250, 511, 0);
 
-    Octree* octree = new Octree("files.txt");
-    octree->getCorte(p1, p2, p3, p4)->display(); // corte transversal
-    delete octree;
+    // paralelo al plano YZ
+    // Punto p1 = Punto(200, 0, 35);
+    // Punto p2 = Punto(200, 511, 35);
+    // Punto p3 = Punto(200, 0, 0);
+    // Punto p4 = Punto(200, 511, 0);
 
-    // Plano* plano = new Plano(p1, p2, p3, p4);
+    /*
+    
+        Insertar las estadisticas acá:
+            Tiempo de ejecución promedio de 'getCorte':
+                Para el cubo
+                Para el octree
+            Uso de RAM
+                Para el cubo
+                Para el octree
 
-    // Punto i = Punto(2, 2, 2);
-    // Punto f = Punto(400, 400, 400);
+    */
 
-    // Punto i = Punto(255, 255, 0);
-    // Punto f = Punto(512, 512, 5);
+    if (ed == OCTREE) {
 
-    // nodo* node = new nodo(i, f);
+        print_with_color(AZUL, "A continuación se mostrarán 20 cortes random usando el Octree.\n");
 
-    // cout << plano->intersects(node) << '\n';
+        Octree* octree = new Octree("files.txt");
 
-    // delete plano;
+        int sum = 0;        
+        for (int i = 0; i < 20; ++i) {
+            auto start = chrono::high_resolution_clock::now();
+            CImg<float>* temp = octree->getCorte(puntos[i][0], puntos[i][1], puntos[i][2], puntos[i][3]);
+            auto end = chrono::high_resolution_clock::now();
+            auto executionTime = chrono::duration_cast<chrono::microseconds>(end - start);
+            sum += executionTime.count();
+            temp->display();
+        }
+        string msg = "Tiempo promedio de ejecución de 'getCorte': " + to_string(sum/20) + " us.\n";
+        print_colorful(VERDE, msg);
+
+        delete octree;
+    } else if (ed == CUBO) {
+
+        print_with_color(AZUL, "A continuación se mostrarán 20 cortes random usando el Cubo.\n");
+
+        Cubo* cubo = new Cubo("files.txt");
+
+        int sum = 0;        
+        for (int i = 0; i < 20; ++i) {
+            auto start = chrono::high_resolution_clock::now();
+            CImg<float>* temp = cubo->getCorte(puntos[i][0], puntos[i][1], puntos[i][2], puntos[i][3]);
+            auto end = chrono::high_resolution_clock::now();
+            auto executionTime = chrono::duration_cast<chrono::microseconds>(end - start);
+            sum += executionTime.count();
+            temp->display();
+        }
+        string msg = "Tiempo promedio de ejecución de 'getCorte': " + to_string(sum/20) + " us.\n";
+        print_colorful(VERDE, msg);
+
+        delete cubo;
+    } else {
+        print_with_color(ROJO, "Opción inválida.");
+        return 0;
+    }
 
     return 0;
 }
-
-// 20 PUNTOS RANDOM:
-
-// PARALELOS A LA CARA FRONTAL
-
-Punto p1 = Punto(0, 128, 35);
-Punto p2 = Punto(511, 128, 35);
-Punto p3 = Punto(0, 128, 0);
-Punto p4 = Punto(511, 128, 0);
-Plano plano = Plano(p1, p2, p3, p4);
-
-// Punto p1 = Punto(0, 255, 35);
-// Punto p2 = Punto(511, 255, 35);
-// Punto p3 = Punto(0, 255, 0);
-// Punto p4 = Punto(511, 255, 0);
-// Plano plano = Plano(p1, p2, p3, p4);
-
-// Punto p1 = Punto(0, 383, 35);
-// Punto p2 = Punto(511, 383, 35);
-// Punto p3 = Punto(0, 383, 0);
-// Punto p4 = Punto(511, 383, 0);
-// Plano plano = Plano(p1, p2, p3, p4);
-
-// Punto p1 = Punto(0, 200, 35);
-// Punto p2 = Punto(511, 200, 35);
-// Punto p3 = Punto(0, 200, 0);
-// Punto p4 = Punto(511, 200, 0);
-// Plano plano = Plano(p1, p2, p3, p4);
-
-// Punto p1 = Punto(0, 400, 35);
-// Punto p2 = Punto(511, 400, 35);
-// Punto p3 = Punto(0, 400, 0);
-// Punto p4 = Punto(511, 400, 0);
-// Plano plano = Plano(p1, p2, p3, p4);
-
-// Punto p1 = Punto(0, 100, 35);
-// Punto p2 = Punto(511, 100, 35);
-// Punto p3 = Punto(0, 100, 0);
-// Punto p4 = Punto(511, 100, 0);
-// Plano plano = Plano(p1, p2, p3, p4);
-
-// Punto p1 = Punto(0, 50, 35);
-// Punto p2 = Punto(511, 50, 35);
-// Punto p3 = Punto(0, 50, 0);
-// Punto p4 = Punto(511, 50, 0);
-// Plano plano = Plano(p1, p2, p3, p4);
-
-// PARALELOS A LA CARA DEL COSTADO
-
-// Punto p1 = Punto(255, 0, 35);
-// Punto p2 = Punto(255, 511, 35);
-// Punto p3 = Punto(255, 0, 0);
-// Punto p4 = Punto(255, 511, 0);
-// Plano plano = Plano(p1, p2, p3, p4);
-
-// Punto p1 = Punto(128, 0, 35);
-// Punto p2 = Punto(128, 511, 35);
-// Punto p3 = Punto(128, 0, 0);
-// Punto p4 = Punto(128, 511, 0);
-// Plano plano = Plano(p1, p2, p3, p4);
-
-// Punto p1 = Punto(383, 0, 35);
-// Punto p2 = Punto(383, 511, 35);
-// Punto p3 = Punto(383, 0, 0);
-// Punto p4 = Punto(383, 511, 0);
-// Plano plano = Plano(p1, p2, p3, p4);
-
-// Punto p1 = Punto(200, 0, 35);
-// Punto p2 = Punto(200, 511, 35);
-// Punto p3 = Punto(200, 0, 0);
-// Punto p4 = Punto(200, 511, 0);
-// Plano plano = Plano(p1, p2, p3, p4);
-
-// Punto p1 = Punto(400, 0, 35);
-// Punto p2 = Punto(400, 511, 35);
-// Punto p3 = Punto(400, 0, 0);
-// Punto p4 = Punto(400, 511, 0);
-// Plano plano = Plano(p1, p2, p3, p4);
-
-// Punto p1 = Punto(100, 0, 35);
-// Punto p2 = Punto(100, 511, 35);
-// Punto p3 = Punto(100, 0, 0);
-// Punto p4 = Punto(100, 511, 0);
-// Plano plano = Plano(p1, p2, p3, p4);
-
-// Punto p1 = Punto(50, 0, 35);
-// Punto p2 = Punto(50, 511, 35);
-// Punto p3 = Punto(50, 0, 0);
-// Punto p4 = Punto(50, 511, 0);
-// Plano plano = Plano(p1, p2, p3, p4);
-
-// PARALELOS A LA CARA DEL PISO
-
-// Punto p1 = Punto(0, 0, 35);
-// Punto p2 = Punto(0, 511, 35);
-// Punto p3 = Punto(511, 0, 35);
-// Punto p4 = Punto(511, 511, 35);
-// Plano plano = Plano(p1, p2, p3, p4);
-
-// Punto p1 = Punto(0, 0, 5);
-// Punto p2 = Punto(0, 511, 5);
-// Punto p3 = Punto(511, 0, 5);
-// Punto p4 = Punto(511, 511, 5);
-// Plano plano = Plano(p1, p2, p3, p4);
-
-// Punto p1 = Punto(0, 0, 10);
-// Punto p2 = Punto(0, 511, 10);
-// Punto p3 = Punto(511, 0, 10);
-// Punto p4 = Punto(511, 511, 10);
-// Plano plano = Plano(p1, p2, p3, p4);
-
-// Punto p1 = Punto(0, 0, 15);
-// Punto p2 = Punto(0, 511, 15);
-// Punto p3 = Punto(511, 0, 15);
-// Punto p4 = Punto(511, 511, 15);
-// Plano plano = Plano(p1, p2, p3, p4);
-
-// Punto p1 = Punto(0, 0, 20);
-// Punto p2 = Punto(0, 511, 20);
-// Punto p3 = Punto(511, 0, 20);
-// Punto p4 = Punto(511, 511, 20);
-// Plano plano = Plano(p1, p2, p3, p4);
-
-// Punto p1 = Punto(0, 0, 25);
-// Punto p2 = Punto(0, 511, 25);
-// Punto p3 = Punto(511, 0, 25);
-// Punto p4 = Punto(511, 511, 25);
-// Plano plano = Plano(p1, p2, p3, p4);

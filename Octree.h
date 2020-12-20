@@ -1,5 +1,5 @@
-#ifndef OCTREE
-#define OCTREE
+#ifndef OCTREE_H
+#define OCTREE_H
 
 #include <bits/stdc++.h>
 
@@ -8,7 +8,7 @@
 #include "funciones.h"
 
 // el numero de imagenes de tipo .bmp
-static const int M = 36;
+static const int M = 40;
 
 class Octree {
     nodo* root{0};
@@ -23,12 +23,12 @@ public:
             while (getline(file, path)) {                
                 auto img = CImg<float>(path.c_str());
                 images[i++] = binarizar(img, 128);
-                if (i == M) break;
+                // if (i == M) break;
             }
             file.close();
         }
         Punto i = Punto(0, 0, 0);
-        Punto final = Punto(512, 512, M-1);
+        Punto final = Punto(511, 511, M-1);
         root = new nodo(i, final);
         insert(i, final);
     }
@@ -58,33 +58,67 @@ public:
             // en la imagen original? si es así, creo que lo de abajo está mal
             // sí
 
-            // int minX = INT_MAX;
-            // int maxX = INT_MIN;
-            // int minY = INT_MAX;
-            // int maxY = INT_MIN;
+            int minX = INT_MAX;
+            int maxX = INT_MIN;
+            int minY = INT_MAX;
+            int maxY = INT_MIN;
 
-            // for (const auto& punto : puntos) {
-            //     minX = min(minX, (int)punto.x);
-            //     minY = min(minY, (int)punto.y);
-            //     maxX = max(maxX, (int)punto.x);
-            //     maxY = max(maxY, (int)punto.y);
-            // }
+            auto r = plano->interseccion_simple(node);
+            vector<Punto> puntos = r.first;
+            string paralelidad = r.second;
 
-            int minX = node->i.x;
-            int maxX = node->f.x;
-            int minY = node->i.y;
-            int maxY = node->f.y;
+            if (paralelidad == "xz") {
+                for (const auto& punto : puntos) {
+                    minX = min(minX, (int) punto.x);
+                    maxX = max(maxX, (int) punto.x);
+                    minY = min(minY, (int) abs( (plano->getMaxZ() - plano->getMinZ()) - punto.y) );
+                    maxY = max(maxY, (int) abs( (plano->getMaxZ() - plano->getMinZ()) - punto.y) );
+                }
+            } else if (paralelidad == "yz") {
+                for (const auto& punto : puntos) {
+                    // y -> x
+                    // y -> ( getMaxY()-getMinY() )-z
+                    minX = min(minX, (int) punto.y);
+                    maxX = max(maxX, (int) punto.y);
+                    minY = min(minY, (int) abs( (plano->getMaxZ() - plano->getMinZ()) - punto.z) );
+                    maxY = max(maxY, (int) abs( (plano->getMaxZ() - plano->getMinZ()) - punto.z) );
+                }
+            } else if (paralelidad == "xy") {
+                for (const auto& punto : puntos) {
+                    // x -> y
+                    // y -> x
+                    minX = min(minX, (int)punto.y);
+                    maxX = max(maxX, (int)punto.y);
+                    minY = min(minY, (int)punto.x);
+                    maxY = max(maxY, (int)punto.x);
+                }
+            }
 
-            // FIXME: arreglar con lo de pasto
+            // FIXME: necesitamos el cont
             for (int i = minX; i <= maxX; ++i) {
                 for (int j = minY; j <= maxY; ++j) {
                     // puede ser que en result no se tenga que pintar en (i, j)
                     (*result)(i, j) = node->color;
                 }
             }
+
+            // int minX = node->i.x;
+            // int maxX = node->f.x;
+            // int minY = node->i.y;
+            // int maxY = node->f.y;
+
+            // cout << "minX: " << minX << ", maxX: " << maxX << ", minY: " << minY << ", maxY: " << maxY << '\n';
+
+            // // FIXME: arreglar con lo de pasto
+            // for (int i = minX; i <= maxX; ++i) {
+            //     for (int j = minY; j <= maxY; ++j) {
+            //         // puede ser que en result no se tenga que pintar en (i, j)
+            //         (*result)(i, j) = node->color;
+            //     }
+            // }
         }
         for (int i = 0; i < 8; ++i) { // optmizacion del octree
-            if (plano->intersects(node->children[i])) {
+            if (!plano->interseccion_simple(node->children[i]).first.empty()) {
                 search(node->children[i], result, plano);
             }
         }
@@ -130,10 +164,10 @@ public:
         //cout << "mid: " << mid.x << ", " << mid.y << ", " << mid.z << "\n";
 
         // FIXME: quizas estos casos estan mal
-        if (abs(f.z - i.z) == 1) {
+        if (abs(f.z - i.z) == 1) { // hay dos imagenes
             midZ = i.z;
             finalZ = f.z;
-        } else if (abs(f.z - i.z) == 0) {
+        } else if (abs(f.z - i.z) == 0) { // hay una imagen
             unaImagen = true;
             midZ = i.z;
         }
@@ -155,19 +189,19 @@ public:
         Punto c4_f (f.x, f.y, midZ);
 
         // Cubo 5 (i.x, i.y, mid.z+1) -> (mid.x, mid.y, f.z) 
-        Punto c5_i (i.x, i.y, mid.z+1);
+        Punto c5_i (i.x, i.y, midZ+1);
         Punto c5_f (mid.x, mid.y, finalZ);
 
         // Cubo 6 (mid.x+1, i.y, mid.z+1) -> (f.x, mid.y, f.z) 
-        Punto c6_i (mid.x+1, i.y, mid.z+1);
+        Punto c6_i (mid.x+1, i.y, midZ+1);
         Punto c6_f (f.x, mid.y, finalZ);
 
         // Cubo 7 (i.x, mid.y+1, mid.z+1) -> (mid.x, f.y, f.z)
-        Punto c7_i (i.x, mid.y+1, mid.z+1);
+        Punto c7_i (i.x, mid.y+1, midZ+1);
         Punto c7_f (mid.x, f.y, finalZ);
 
         // Cubo 8 mid+1 -> f
-        Punto c8_i (mid.x+1, mid.y+1, mid.z+1);
+        Punto c8_i (mid.x+1, mid.y+1, midZ+1);
         Punto c8_f (f.x, f.y, finalZ);
 
         //cout << "crearon los puntos\n";

@@ -224,8 +224,9 @@ struct Plano{
         }
             // Case 2
         else {
-            if (D1 == 0 && D2 == 0 && D3 == 0)
-                printf("Infinite solutions\n");
+            if (D1 == 0 && D2 == 0 && D3 == 0) {
+                // printf("Infinite solutions\n");
+            }
             else if (D1 != 0 || D2 != 0 || D3 != 0)
                 printf("No solutions\n");
         }
@@ -403,9 +404,72 @@ struct Plano{
 */
         // if(coor)
 
-    
+
     }
 
+    pair<vector<Punto>, string> interseccion_simple(nodo* node){
+
+        if (!node) return make_pair(vector<Punto>(), "");
+
+        double x_s = node->i.x;
+        double x_e = node->f.x;
+        double y_s = node->i.y;
+        double y_e = node->f.y;
+        double z_s = node->i.z;
+        double z_e = node->f.z;
+
+        string paralelidad;
+
+        if(l2a.y == l1b.y){
+            paralelidad = "xz";
+        }else if(l2a.x == l1b.x){
+            paralelidad = "yz";
+        }else if(l2a.z == l1b.z){
+            paralelidad = "xy";
+        } else {
+            cout << "paralelidad desconocida: " << paralelidad << "\n";
+        }
+
+        if(paralelidad == "xz"){
+            if(l2a.y >= y_s && l2a.y <= y_e){
+                Punto p1(x_s, l2a.y, z_e);
+                Punto p2(x_e, l2a.y, z_e);
+                Punto p3(x_s, l2a.y, z_s);
+                Punto p4(x_e, l2a.y, z_s);
+
+                return {{p1,p2,p3,p4}, paralelidad};
+            }
+            else{
+                return make_pair(vector<Punto>(), "");
+            }
+        }else if (paralelidad == "xy"){
+            if(l2a.z >= z_s && l2a.z <= z_e){
+                Punto p1(x_s, y_s, l2a.z);
+                Punto p2(x_s, y_e, l2a.z);
+                Punto p3(x_e, y_s, l2a.z);
+                Punto p4(x_e, y_e, l2a.z);
+
+                return {{p1,p2,p3,p4}, paralelidad};
+            }
+            else{
+                return make_pair(vector<Punto>(), "");
+            }
+        }else if(paralelidad == "yz"){
+            if(l2a.x >= x_s && l2a.x <= x_e){
+                Punto p1(l2a.x, y_s, z_e);
+                Punto p2(l2a.x, y_e, z_e);
+                Punto p3(l2a.x, y_s, z_s);
+                Punto p4(l2a.x, y_e, z_s);
+
+                return {{p1,p2,p3,p4}, paralelidad};
+            }
+            else{
+                return make_pair(vector<Punto>(), "");
+            }
+        } else {
+            return make_pair(vector<Punto>(), "");
+        }
+    }
 
 
     bool intersects(nodo* node) {
@@ -476,5 +540,155 @@ struct Plano{
 
 };
 
+// 20 CORTES RANDOM:
+
+// PARALELOS AL PLANO XZ
+
+Punto b1 = Punto(0, 128, 39);
+Punto b2 = Punto(511, 128, 39);
+Punto b3 = Punto(0, 128, 0);
+Punto b4 = Punto(511, 128, 0);
+// Plano plano = Plano(p1, p2, p3, p4);
+
+Punto a1 = Punto(0, 255, 39);
+Punto a2 = Punto(511, 255, 39);
+Punto a3 = Punto(0, 255, 0);
+Punto a4 = Punto(511, 255, 0);
+// Plano a5 = Plano(p1, p2, p3, p4);
+
+Punto a5 = Punto(0, 383, 39);
+Punto a6 = Punto(511, 383, 39);
+Punto a7 = Punto(0, 383, 0);
+Punto a8 = Punto(511, 383, 0);
+// Plano plano = Plano(p1, p2, p3, p4);
+
+Punto a9 = Punto(0, 200, 39);
+Punto a10 = Punto(511, 200, 39);
+Punto a11 = Punto(0, 200, 0);
+Punto a12 = Punto(511, 200, 0);
+// Plano a13 = Plano(p1, p2, p3, p4);
+
+Punto a13 = Punto(0, 400, 39);
+Punto a14 = Punto(511, 400, 39);
+Punto a15 = Punto(0, 400, 0);
+Punto a16 = Punto(511, 400, 0);
+// Plano plano = Plano(p1, p2, p3, p4);
+
+Punto a17 = Punto(0, 100, 39);
+Punto a18 = Punto(511, 100, 39);
+Punto a19 = Punto(0, 100, 0);
+Punto a20 = Punto(511, 100, 0);
+// Plano plano = Plano(p1, p2, p3, p4);
+
+Punto a21 = Punto(0, 50, 39);
+Punto a22 = Punto(511, 50, 39);
+Punto a23 = Punto(0, 50, 0);
+Punto a24 = Punto(511, 50, 0);
+// Plano plano = Plano(p1, p2, p3, p4);
+
+// PARALELOS AL PLANO YZ
+
+Punto a25 = Punto(255, 0, 39);
+Punto a26 = Punto(255, 511, 39);
+Punto a27 = Punto(255, 0, 0);
+Punto a28 = Punto(255, 511, 0);
+// Plano plano = Plano(p1, p2, p3, p4);
+
+Punto a29 = Punto(128, 0, 39);
+Punto a30 = Punto(128, 511, 39);
+Punto a31 = Punto(128, 0, 0);
+Punto a32 = Punto(128, 511, 0);
+// Plano plano = Plano(p1, p2, p3, p4);
+
+Punto a33 = Punto(383, 0, 39);
+Punto a34 = Punto(383, 511, 39);
+Punto a35 = Punto(383, 0, 0);
+Punto a36 = Punto(383, 511, 0);
+// Plano plano = Plano(p1, p2, p3, p4);
+
+Punto a37 = Punto(200, 0, 39);
+Punto a38 = Punto(200, 511, 39);
+Punto a39 = Punto(200, 0, 0);
+Punto a40 = Punto(200, 511, 0);
+// Plano plano = Plano(p1, p2, p3, p4);
+
+Punto a41 = Punto(400, 0, 39);
+Punto a42 = Punto(400, 511, 39);
+Punto a43 = Punto(400, 0, 0);
+Punto a44 = Punto(400, 511, 0);
+// Plano plano = Plano(p1, p2, p3, p4);
+
+Punto a45 = Punto(100, 0, 39);
+Punto a46 = Punto(100, 511, 39);
+Punto a47 = Punto(100, 0, 0);
+Punto a48 = Punto(100, 511, 0);
+// Plano plano = Plano(p1, p2, p3, p4);
+
+Punto a49 = Punto(55, 0, 39);
+Punto a50 = Punto(55, 511, 39);
+Punto a51 = Punto(55, 0, 0);
+Punto a52 = Punto(55, 511, 0);
+// Plano plano = Plano(p1, p2, p3, p4);
+
+// PARALELOS AL PLANO XY
+
+Punto a53 = Punto(0, 0, 39);
+Punto a54 = Punto(0, 511, 30);
+Punto a55 = Punto(511, 0, 39);
+Punto a56 = Punto(511, 511, 39);
+// Plano plano = Plano(p1, p2, p3, p4);
+
+Punto a57 = Punto(0, 0, 10);
+Punto a58 = Punto(0, 511, 10);
+Punto a59 = Punto(511, 0, 10);
+Punto a60 = Punto(511, 511, 10);
+// Plano plano = Plano(p1, p2, p3, p4);
+
+Punto a61 = Punto(0, 0, 5);
+Punto a62 = Punto(0, 511, 5);
+Punto a63 = Punto(511, 0, 5);
+Punto a64 = Punto(511, 511, 5);
+// Plano plano = Plano(p1, p2, p3, p4);
+
+Punto a65 = Punto(0, 0, 15);
+Punto a66 = Punto(0, 511, 15);
+Punto a67 = Punto(511, 0, 15);
+Punto a68 = Punto(511, 511, 15);
+// Plano plano = Plano(p1, p2, p3, p4);
+
+Punto a69 = Punto(0, 0, 20);
+Punto a70 = Punto(0, 511, 20);
+Punto a71 = Punto(511, 0, 20);
+Punto a72 = Punto(511, 511, 20);
+// Plano plano = Plano(p1, p2, p3, p4);
+
+Punto a73 = Punto(0, 0, 25);
+Punto a74 = Punto(0, 511, 25);
+Punto a75 = Punto(511, 0, 25);
+Punto a76 = Punto(511, 511, 25);
+// Plano plano = Plano(p1, p2, p3, p4);
+
+vector< vector<Punto> > puntos = {
+    {b1, b2, b3, b4},
+    {a1, a2, a3, a4},
+    {a5, a6, a7, a8},
+    {a9, a10, a11, a12},
+    {a13, a14, a15, a16},
+    {a17, a18, a19, a20},
+    {a21, a22, a23, a24},
+    {a25, a26, a27, a28},
+    {a29, a30, a31, a32},
+    {a33, a34, a35, a36},
+    {a37, a38, a39, a40},
+    {a41, a42, a43, a44},
+    {a45, a46, a47, a48},
+    {a49, a50, a51, a52},
+    {a53, a54, a55, a56},
+    {a57, a58, a59, a60},
+    {a61, a62, a63, a64},
+    {a65, a66, a67, a68},
+    {a69, a70, a71, a72},
+    {a73, a74, a75, a76}
+};
 
 #endif

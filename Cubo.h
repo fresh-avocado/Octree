@@ -1,5 +1,5 @@
-#ifndef CUBO
-#define CUBO
+#ifndef CUBO_H
+#define CUBO_H
 
 #include <bits/stdc++.h>
 #include "CImg.h"
@@ -10,7 +10,7 @@ using namespace std;
 using namespace cimg_library;
 
 // el numero de imagenes de tipo .bmp
-static const int N = 36;
+static const int N = 40;
 
 class Cubo {
     CImg<float>* images[N];
@@ -22,6 +22,7 @@ public:
             int i = 0;
             while (getline(file, path)) {                
                 auto img = CImg<float>(path.c_str());
+                cout << path << endl;
                 images[i++] = binarizar(img, 128);
             }
             file.close();
@@ -38,20 +39,32 @@ public:
         int yi = p.getMinY();
         int yf = p.getMaxY();
 
-        // int limit1, limit2;
+        int limit1, limit2;
 
-        // if (yi == yf) { 
-        //     limit1 = xf-xi;
-        //     limit2 = zf-zi;
-        // } else if (zi == zf) { 
-        //     limit1 = 
-        // } else if (xi == xf) {
-
-        // } else {
-        //     // inclinado
-        //     // chequear qué planos atraviesa
-        //     cout << "plano inclinado\n";
-        // }
+        if (yi == yf) { 
+            limit1 = 512;
+            limit2 = zf-zi;
+        } else if (zi == zf) { 
+            limit1 = 512;
+            limit2 = 512;
+        } else if (xi == xf) {
+            limit1 = 512;
+            limit2 = zf-zi;
+        } else {
+            // inclinado
+            // chequear qué planos atraviesa
+            // De derecha a izquierda
+            if (zf-zi < yf - yi || zf-zi < xf - xi) {
+                limit1 = 512;
+                limit2 = zf-zi;
+            } 
+            // De arriba a abajo
+            else {
+                limit1 = 512;
+                limit2 = zf-zi;
+            }
+            cout << "plano inclinado\n";
+        }
 
         CImg<float>* result = new CImg<float>(512, 512);
 
@@ -61,6 +74,8 @@ public:
         }
 
         cout << "zi: " << zi << " zf: " << zf << " xi: " << xi << " xf: " << xf << " yi: " << yi << " yf: " << yf << endl;
+
+        // zi: 0 zf: 39 xi: 255 xf: 255 yi: 0 yf: 511    da error    
 
         // return result;
         int cont_x = 0;
@@ -73,8 +88,13 @@ public:
                     (*result)(cont_x, cont_y) = (*img)(j, k);
                     // (*result)(j-xi, i-zi) = (*img)(j, k);
                     // cout << "x: " << j << ", y: " << k << ", z: " << i << '\n';
+                    if (xf-xi == 0) {
+                        cont_x++;
+                    }
                 }
-                cont_x++;
+                if (yf-yi == 0) {
+                    cont_x++;
+                }
                 // cont_y = 0;
             }
             cont_x = 0;
@@ -110,10 +130,10 @@ public:
     }
 
     ~Cubo() {
-        printf("Destruyendo cubo\n");
+        // printf("Destruyendo cubo\n");
         for (int i = 0; i < N; ++i) {
             if (images[i]) {
-                printf("Destroying %d image\n", i);
+                // printf("Destroying %d image\n", i);
                 delete images[i];
             } else {
                 printf("Image %d is null\n", i);
