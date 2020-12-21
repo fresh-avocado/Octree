@@ -22,7 +22,7 @@ public:
             int i = 0;
             while (getline(file, path)) {                
                 auto img = CImg<float>(path.c_str());
-                cout << path << endl;
+                //cout << path << endl;
                 images[i++] = binarizar(img, 128);
             }
             file.close();
@@ -41,90 +41,76 @@ public:
 
         int limit1, limit2;
 
-        if (yi == yf) { 
-            limit1 = 512;
-            limit2 = zf-zi;
-        } else if (zi == zf) { 
-            limit1 = 512;
-            limit2 = 512;
-        } else if (xi == xf) {
-            limit1 = 512;
-            limit2 = zf-zi;
-        } else {
-            // inclinado
-            // chequear qué planos atraviesa
-            // De derecha a izquierda
-            if (zf-zi < yf - yi || zf-zi < xf - xi) {
-                limit1 = 512;
-                limit2 = zf-zi;
-            } 
-            // De arriba a abajo
-            else {
-                limit1 = 512;
-                limit2 = zf-zi;
-            }
-            cout << "plano inclinado\n";
-        }
+        // De arriba a abajo
+        limit1 = 512;
+        limit2 = N;
 
-        CImg<float>* result = new CImg<float>(512, 512);
+        // CImg<float>* result = new CImg<float>(limit1, limit2);
+        CImg<float>* result = new CImg<float>("./black.BMP");
 
         if (zi == zf) {
             // la imagen en la posicion z
             return images[zi];
         }
 
-        cout << "zi: " << zi << " zf: " << zf << " xi: " << xi << " xf: " << xf << " yi: " << yi << " yf: " << yf << endl;
+        //cout << "zi: " << zi << " zf: " << zf << " xi: " << xi << " xf: " << xf << " yi: " << yi << " yf: " << yf << endl;
 
-        // zi: 0 zf: 39 xi: 255 xf: 255 yi: 0 yf: 511    da error    
+        // TODO: calcular "inclinado"
+        bool inclinado = !(xi == xf || yi == yf || zi == zf);
 
-        // return result;
-        int cont_x = 0;
-        int cont_y = 0;
-        // Creemos que este código está de másx
-        for (int i = zi; i <= zf; ++i) {
-            CImg<float>* img = images[i];
-            for (int j = xi; j <= xf; ++j) {
-                for (int k = yi; k <= yf; ++k) {
-                    (*result)(cont_x, cont_y) = (*img)(j, k);
-                    // (*result)(j-xi, i-zi) = (*img)(j, k);
-                    // cout << "x: " << j << ", y: " << k << ", z: " << i << '\n';
-                    if (xf-xi == 0) {
-                        cont_x++;
+        if (inclinado) {
+            for (int i = zi; i <= zf; ++i) {
+                CImg<float>* img = images[i];
+                // i = z
+
+                auto m_b = p.find_line_given_z(i);
+                long double m = m_b.first;
+                long double b = m_b.second;
+
+                //cout << "m: " << m << ", b: " << b << "\n";
+                //cout << "i: " << i << '\n';
+
+                if (m == -9999) {
+                    // agarrar todos los y's con el 'b' como offset de 'x'
+                    // TODO: hacer este caso
+                    for (int j = yi; j <= yf; ++j) {
+                        //cout << "x: " << b << ", y: " << j << "\n";
+                        (*result)(b, j) = (*img)(b, j);
+                    }
+                } else {
+                    for (int j = xi; j <= xf; ++j) {
+                        int y = m*j + b;
+                        //cout << "x: " << j << ", y: " << y << "\n";
+                        (*result)(j, y) = (*img)(j, y);
                     }
                 }
-                if (yf-yi == 0) {
-                    cont_x++;
-                }
-                // cont_y = 0;
             }
-            cont_x = 0;
-            cont_y++;
-            // cont_x++;
+        } else {
+            int cont_x = 0;
+            int cont_y = 0;
+            // Creemos que este código está de más
+            for (int i = zi; i <= zf; ++i) {
+                CImg<float>* img = images[i];
+                for (int j = xi; j <= xf; ++j) {
+                    for (int k = yi; k <= yf; ++k) {
+                        (*result)(cont_x, cont_y) = (*img)(j, k);
+                        // (*result)(j-xi, i-zi) = (*img)(j, k);
+                        // //cout << "x: " << j << ", y: " << k << ", z: " << i << '\n';
+                        if (xf-xi == 0) {
+                            cont_x++;
+                        }
+                    }
+                    if (yf-yi == 0) {
+                        cont_x++;
+                    }
+                    // cont_y = 0;
+                }
+                cont_x = 0;
+                cont_y++;
+                // cont_x++;
+            }
+            //cout << "cont_x: " << cont_x << " cont_y: " << cont_y << endl;
         }
-        cout << "cont_x: " << cont_x << " cont_y: " << cont_y << endl;
-
-        // hallar puntos de interseccion entre imagen y el plano
-        // hallar m y b a partir de esos dos puntos
-
-        // Caso amarillo 
-        // for (int i = zi; i <= zf; ++i) {
-        //     CImg<float>* img = images[i];
-        //     Punto p1 (0, 0, i);
-        //     Punto p2 (512, 512, i);
-        //     Punto p3 (0, 512, i);
-        //     Punto p4 (512, 0, i);
-        //     Plano p_img (p1, p2, p3, p4);
-
-        //     auto inter = interseccion(p_img, p);
-        //     auto m_b = m_y_b(inter);
-        //     int m = m_b.first;
-        //     int b = m_b.second;
-
-        //     for (int j = xi; j <= xf; ++j) {
-        //         int y = m*j + b;
-        //         (*result)(j, y) = (*img)(j, y);
-        //     }
-        // }
 
         return result;
     }

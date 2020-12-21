@@ -18,33 +18,19 @@ int main() {
 
     cin >> ed;
 
-    // paralelo al plano XZ
-    // Punto p1 = Punto(0, 255, 35);
-    // Punto p2 = Punto(511, 255, 35);
-    // Punto p3 = Punto(0, 255, 0);
-    // Punto p4 = Punto(511, 255, 0);
-
-    // paralelo al plano YZ
-    // Punto p1 = Punto(250, 0, 35);
-    // Punto p2 = Punto(250, 511, 35);
-    // Punto p3 = Punto(250, 0, 0);
-    // Punto p4 = Punto(250, 511, 0);
-
-    // paralelo al plano YZ
-    // Punto p1 = Punto(200, 0, 35);
-    // Punto p2 = Punto(200, 511, 35);
-    // Punto p3 = Punto(200, 0, 0);
-    // Punto p4 = Punto(200, 511, 0);
-
     /*
+        Corrimos los 20 cortes random, sacamos el promedio y eso nos daba un resultado.
+        Ese resultado, lo obtuvimos tres veces (corrimos el programa tres veces) y finalmene
+        sacamos el promedio de esas tres.
     
-        Insertar las estadisticas acá:
             Tiempo de ejecución promedio de 'getCorte':
-                Para el cubo
-                Para el octree
-            Uso de RAM
-                Para el cubo
-                Para el octree
+                Cubo con cortes paralelos: (7403 + 6531 + 6396)/3 = 6776 us
+                Octree con cortes paralelos: (26843 + 32408 + 37710)/3 = 32 320 us
+                Cubo con cortes inclinados y paralelos: (6212 + 5962 + 6206)/3 = 6126 us
+                Octree con cortes inclinados y paralelos: _
+            Uso de RAM:
+                Cubo: (61 + 46 + 51)/3 = 52 MB
+                Octree: (89 + 82 + 88)/3 = 86 MB 
 
     */
 
@@ -57,6 +43,7 @@ int main() {
         int sum = 0;        
         for (int i = 0; i < 20; ++i) {
             auto start = chrono::high_resolution_clock::now();
+            cout << "i: " << i << "\n";
             CImg<float>* temp = octree->getCorte(puntos[i][0], puntos[i][1], puntos[i][2], puntos[i][3]);
             auto end = chrono::high_resolution_clock::now();
             auto executionTime = chrono::duration_cast<chrono::microseconds>(end - start);
@@ -88,7 +75,6 @@ int main() {
         delete cubo;
     } else {
         print_with_color(ROJO, "Opción inválida.");
-        return 0;
     }
 
     return 0;

@@ -34,17 +34,35 @@ public:
     }
 
     CImg<float>* getCorte(Punto p1, Punto p2, Punto p3, Punto p4) {
-        Plano* plano = new Plano(p1, p2, p3, p4);
+        Plano* p = new Plano(p1, p2, p3, p4);
 
-        CImg<float>* result = new CImg<float>(512, 512);
+        int zi = p->getMinZ();
+        int zf = p->getMaxZ();
+        int xi = p->getMinX();
+        int xf = p->getMaxX();
+        int yi = p->getMinY();
+        int yf = p->getMaxY();
 
-        search(root, result, plano);
+        int limit1, limit2;
+        if (xi == xf || yi == yf) {
+            limit1 = 512;
+            limit2 = M;
+        } else {
+            limit1 = 512;
+            limit2 = 512;
+        }
+        CImg<float>* result = new CImg<float>("./black.BMP");
+        // CImg<float>* result = new CImg<float>(512, 512);
 
-        delete plano;
+        bool inclinado = !(xi == xf || yi == yf || zi == zf);
+
+        search(root, result, p, inclinado);
+
+        delete p;
         return result;
     }
 
-    void search(nodo*& node, CImg<float>*& result, Plano*& plano) {
+    void search(nodo*& node, CImg<float>*& result, Plano*& plano, bool inclinado) {
         if (node->isLeaf) {
             // FIXME: qué pasa si solo intersecta en 1, 2 o 3 puntos?
             // vector<Punto> puntos = plano->intersects(node).second;
@@ -58,68 +76,94 @@ public:
             // en la imagen original? si es así, creo que lo de abajo está mal
             // sí
 
-            int minX = INT_MAX;
-            int maxX = INT_MIN;
-            int minY = INT_MAX;
-            int maxY = INT_MIN;
+            // if (inclinado) {
 
-            auto r = plano->interseccion_simple(node);
-            vector<Punto> puntos = r.first;
-            string paralelidad = r.second;
 
-            if (paralelidad == "xz") {
-                for (const auto& punto : puntos) {
-                    minX = min(minX, (int) punto.x);
-                    maxX = max(maxX, (int) punto.x);
-                    minY = min(minY, (int) abs( (plano->getMaxZ() - plano->getMinZ()) - punto.y) );
-                    maxY = max(maxY, (int) abs( (plano->getMaxZ() - plano->getMinZ()) - punto.y) );
-                }
-            } else if (paralelidad == "yz") {
-                for (const auto& punto : puntos) {
-                    // y -> x
-                    // y -> ( getMaxY()-getMinY() )-z
-                    minX = min(minX, (int) punto.y);
-                    maxX = max(maxX, (int) punto.y);
-                    minY = min(minY, (int) abs( (plano->getMaxZ() - plano->getMinZ()) - punto.z) );
-                    maxY = max(maxY, (int) abs( (plano->getMaxZ() - plano->getMinZ()) - punto.z) );
-                }
-            } else if (paralelidad == "xy") {
-                for (const auto& punto : puntos) {
-                    // x -> y
-                    // y -> x
-                    minX = min(minX, (int)punto.y);
-                    maxX = max(maxX, (int)punto.y);
-                    minY = min(minY, (int)punto.x);
-                    maxY = max(maxY, (int)punto.x);
-                }
-            }
+            //     auto m_b = p.find_line_given_z(i);
+            //     long double m = m_b.first;
+            //     long double b = m_b.second;
 
-            // FIXME: necesitamos el cont
-            for (int i = minX; i <= maxX; ++i) {
-                for (int j = minY; j <= maxY; ++j) {
-                    // puede ser que en result no se tenga que pintar en (i, j)
-                    (*result)(i, j) = node->color;
-                }
-            }
+            //     cout << "m: " << m << ", b: " << b << "\n";
+            //     cout << "i: " << i << '\n';
 
-            // int minX = node->i.x;
-            // int maxX = node->f.x;
-            // int minY = node->i.y;
-            // int maxY = node->f.y;
-
-            // cout << "minX: " << minX << ", maxX: " << maxX << ", minY: " << minY << ", maxY: " << maxY << '\n';
-
-            // // FIXME: arreglar con lo de pasto
-            // for (int i = minX; i <= maxX; ++i) {
-            //     for (int j = minY; j <= maxY; ++j) {
-            //         // puede ser que en result no se tenga que pintar en (i, j)
-            //         (*result)(i, j) = node->color;
+            //     if (m == -9999) {
+            //         // agarrar todos los y's con el 'b' como offset de 'x'
+            //         // TODO: hacer este caso
+            //         for (int j = yi; j <= yf; ++j) {
+            //             cout << "x: " << b << ", y: " << j << "\n";
+            //             (*result)(b, j) = (*img)(b, j);
+            //         }
+            //     } else {
+            //         for (int j = xi; j <= xf; ++j) {
+            //             int y = m*j + b;
+            //             cout << "x: " << j << ", y: " << y << "\n";
+            //             (*result)(j, y) = (*img)(j, y);
+            //         }
             //     }
+            // } else {
+                int minX = INT_MAX;
+                int maxX = INT_MIN;
+                int minY = INT_MAX;
+                int maxY = INT_MIN;
+
+                auto r = plano->interseccion_simple(node);
+                vector<Punto> puntos = r.first;
+                string paralelidad = r.second;
+
+                if (paralelidad == "xz") {
+                    for (const auto& punto : puntos) {
+                        minX = min(minX, (int) punto.x);
+                        maxX = max(maxX, (int) punto.x);
+                        minY = min(minY, (int) abs( (plano->getMaxZ() - plano->getMinZ()) - punto.y) );
+                        maxY = max(maxY, (int) abs( (plano->getMaxZ() - plano->getMinZ()) - punto.y) );
+                    }
+                } else if (paralelidad == "yz") {
+                    for (const auto& punto : puntos) {
+                        // y -> x
+                        // y -> ( getMaxY()-getMinY() )-z
+                        minX = min(minX, (int) punto.y);
+                        maxX = max(maxX, (int) punto.y);
+                        minY = min(minY, (int) abs( (plano->getMaxZ() - plano->getMinZ()) - punto.z) );
+                        maxY = max(maxY, (int) abs( (plano->getMaxZ() - plano->getMinZ()) - punto.z) );
+                    }
+                } else if (paralelidad == "xy") {
+                    for (const auto& punto : puntos) {
+                        // x -> y
+                        // y -> x
+                        minX = min(minX, (int)punto.y);
+                        maxX = max(maxX, (int)punto.y);
+                        minY = min(minY, (int)punto.x);
+                        maxY = max(maxY, (int)punto.x);
+                    }
+                }
+
+                for (int i = minX; i <= maxX; ++i) {
+                    for (int j = minY; j <= maxY; ++j) {
+                        // puede ser que en result no se tenga que pintar en (i, j)
+                        (*result)(i, j) = node->color;
+                    }
+                }
             // }
         }
-        for (int i = 0; i < 8; ++i) { // optmizacion del octree
-            if (!plano->interseccion_simple(node->children[i]).first.empty()) {
-                search(node->children[i], result, plano);
+        if (inclinado) {
+            for (int i = 0; i < 8; ++i) {
+                if (plano->intersects(node->children[i])) {
+                    search(node->children[i], result, plano, inclinado);
+                }
+                // pair<float, float> inter;
+                // for (int j = nodo->i.z; j <= nodo->f.z; ++j) {
+                //     inter = xy_with_given_z(j);
+                //     if ((inter.first < nodo->i.x || inter.first > nodo->f.x) || (inter.second < nodo->i.y || inter.second > nodo->f.y)) {
+                //     }
+                // }
+                // inter = xy_with_given_z(nodo->i.z);
+                // inter = xy_with_given_z(nodo->f.z);
+            }
+        } else {
+            for (int i = 0; i < 8; ++i) { // optmizacion del octree
+                if (!plano->interseccion_simple(node->children[i]).first.empty()) {
+                    search(node->children[i], result, plano, inclinado);
+                }
             }
         }
     }

@@ -121,25 +121,30 @@ struct Plano{
         return max({l1a.y, l1b.y, l2a.y, l2b.y});
     }
 
-    pair<float,float> find_line(Punto A, Punto B) {
-        float a1 = B.y - A.y;
-        float b1 = A.x - B.x;
-        float c1 = a1*A.x + b1*A.y;
+    pair<double ,double> find_line(Punto A, Punto B) {
+        double a1 = B.y - A.y;
+        double b1 = A.x - B.x;
+        double c1 = a1*A.x + b1*A.y;
+        if (round(b1) == 0) {
+            return {-9999, A.x};
+        }
         rxm = (a1*-1)/b1;
         b = c1/b1;
         //cout << rxm << "x + " << b;
         return {rxm, b};
     }
 
-    pair<float,float> find_line_given_z( float z) {
+    pair<double,double> find_line_given_z( double z) {
 
         auto xy = xy_with_given_z(z);
 
-        float diff_x = l2b.x - xy.first;
-        float diff_y = l2b.y - xy.second;
+        double diff_x = l2b.x - xy.first;
+        double diff_y = l2b.y - xy.second;
 
         Punto l2b_aux(xy.first, xy.second, z);
         Punto l2a_aux(l2a.x - diff_x, l2a.y - diff_y, z);
+
+        return find_line(l2b_aux, l2a_aux);
 
        //cout << "l2b_aux = {" << l2b_aux.x << "," << l2b_aux.y << "} l2a_aux = {"  << l2a_aux.x << "," << l2a_aux.y << "}";
 
@@ -231,6 +236,10 @@ struct Plano{
                 printf("No solutions\n");
         }
     }
+
+    /*
+        
+    */
     
     
 
@@ -404,6 +413,8 @@ struct Plano{
 */
         // if(coor)
 
+        return vector<Punto>();
+
 
     }
 
@@ -427,7 +438,7 @@ struct Plano{
         }else if(l2a.z == l1b.z){
             paralelidad = "xy";
         } else {
-            cout << "paralelidad desconocida: " << paralelidad << "\n";
+            // cout << "paralelidad desconocida: " << paralelidad << "\n";
         }
 
         if(paralelidad == "xz"){
@@ -550,41 +561,65 @@ Punto b3 = Punto(0, 128, 0);
 Punto b4 = Punto(511, 128, 0);
 // Plano plano = Plano(p1, p2, p3, p4);
 
-Punto a1 = Punto(0, 255, 39);
-Punto a2 = Punto(511, 255, 39);
-Punto a3 = Punto(0, 255, 0);
-Punto a4 = Punto(511, 255, 0);
-// Plano a5 = Plano(p1, p2, p3, p4);
+Punto a1 = Punto(0, 100, 39);
+Punto a2 = Punto(511, 100, 39);
+Punto a3 = Punto(0, 100, 0);
+Punto a4 = Punto(511, 100, 0);
 
-Punto a5 = Punto(0, 383, 39);
-Punto a6 = Punto(511, 383, 39);
-Punto a7 = Punto(0, 383, 0);
-Punto a8 = Punto(511, 383, 0);
-// Plano plano = Plano(p1, p2, p3, p4);
+Punto a5 = Punto(0, 50, 39);
+Punto a6 = Punto(511, 50, 39);
+Punto a7 = Punto(0, 50, 0);
+Punto a8 = Punto(511, 50, 0);
 
-Punto a9 = Punto(0, 200, 39);
-Punto a10 = Punto(511, 200, 39);
-Punto a11 = Punto(0, 200, 0);
-Punto a12 = Punto(511, 200, 0);
-// Plano a13 = Plano(p1, p2, p3, p4);
+Punto a9 = Punto(0, 300, 39);
+Punto a10 = Punto(511, 300, 39);
+Punto a11 = Punto(0, 300, 0);
+Punto a12 = Punto(511, 300, 0);
 
 Punto a13 = Punto(0, 400, 39);
 Punto a14 = Punto(511, 400, 39);
 Punto a15 = Punto(0, 400, 0);
 Punto a16 = Punto(511, 400, 0);
-// Plano plano = Plano(p1, p2, p3, p4);
 
-Punto a17 = Punto(0, 100, 39);
-Punto a18 = Punto(511, 100, 39);
-Punto a19 = Punto(0, 100, 0);
-Punto a20 = Punto(511, 100, 0);
-// Plano plano = Plano(p1, p2, p3, p4);
+Punto a17 = Punto(0, 500, 39);
+Punto a18 = Punto(511, 500, 39);
+Punto a19 = Punto(0, 500, 0);
+Punto a20 = Punto(511, 500, 0);
 
-Punto a21 = Punto(0, 50, 39);
-Punto a22 = Punto(511, 50, 39);
-Punto a23 = Punto(0, 50, 0);
-Punto a24 = Punto(511, 50, 0);
-// Plano plano = Plano(p1, p2, p3, p4);
+Punto a21 = Punto(0, 255, 39);
+Punto a22 = Punto(511, 255, 39);
+Punto a23 = Punto(0, 255, 0);
+Punto a24 = Punto(511, 255, 0);
+
+// Punto a1(511, 0, 19);
+// Punto a2(0, 0, 19);
+// Punto a3(511, 511, (int) 39.0/1.5);
+// Punto a4(0, 511, (int) 39.0/1.5);
+
+// Punto a5(0,400,38);
+// Punto a6(511,400,38);
+// Punto a7(0,0,0);
+// Punto a8(511,0,0);
+
+// Punto a9(300,0,38);
+// Punto a10(300,511,38);
+// Punto a11(50,0,0);
+// Punto a12(50,511,0);
+
+// Punto a13(0,250,38);
+// Punto a14(511,250,38);
+// Punto a15(0,50,0);
+// Punto a16(511,50,0);
+
+// Punto a17(0,250,38);
+// Punto a18(511,250,38);
+// Punto a19(0,100,0);
+// Punto a20(511,100,0);
+
+// Punto a21(0,511,15);
+// Punto a22(0,0,15);
+// Punto a23(500,511,0);
+// Punto a24(500,0,0);
 
 // PARALELOS AL PLANO YZ
 
