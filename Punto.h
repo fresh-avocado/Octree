@@ -294,10 +294,15 @@ struct Plano{
         };
 
 
+
         double xi, yi, zi;
+
+        //hallo la resolucion de la ecuacion de 3 variables para ver en que sitio se intersecan los planos
 
         findSolution(coeff, xi,yi,zi);
 
+        //aqui verifico para cada rango del cubo, si es que existe un punto dada una coordenada fija, dentro del cubo con dicha línea de intersección
+        //si eso es verdad, hemos encontrado una intersección.
         for (int x = x_start; x <= x_end ; ++x) {
            /*
               x = x1 + A3 * t
@@ -365,59 +370,8 @@ struct Plano{
 
     }
 
-    vector<Punto> hallar_puntos(Punto a1, Punto b1, Punto c1, Punto a2, Punto b2, Punto c2, int coor, double c_start, double c_end){
-        //ecuacion plano 1;
-        auto p1 = a1-b1;
-        auto p2 = a1-c1;
-        auto p3 = p1 * p2;
-        auto A1 = p3.x;
-        auto B1 = p3.y;
-        auto C1 = p3.z;
 
-        Punto plano1( A1, B1, C1);
-
-        auto D1 = (A1*a1.x + B1*a1.y + C1*a1.z);
-
-
-        auto g1 = a2-b2;
-        auto g2 = a2-c2;
-        auto g3 = g1 * g2;
-        auto A2 = g3.x;
-        auto B2 = g3.y;
-        auto C2 = g3.z;
-
-        Punto plano2( A2, B2, C2);
-
-        auto D2 = (A2*a2.x + B2*a2.y + C2*a2.z);
-
-        Punto linea = plano1*plano2;
-
-        auto A3 = linea.x;
-        auto B3 = linea.y;
-        auto C3 = linea.z;
-
-        double coeff[3][4] = {
-                { A1, B1, C1, D1 },
-                { A2, B2, C2, D2 },
-                { A3, B3, C3, 0 },
-        };
-
-
-        double xi, yi, zi;
-
-        findSolution(coeff, xi,yi,zi);
-/*
-            x = x1 + A3 * t
-            y = y1 + B3 * t
-            z = z1 + C3 * t
-*/
-        // if(coor)
-
-        return vector<Punto>();
-
-
-    }
-
+    
     pair<vector<Punto>, string> interseccion_simple(nodo* node){
 
         if (!node) return make_pair(vector<Punto>(), "");
@@ -548,6 +502,216 @@ struct Plano{
 
         return( piso || techo || izquierda || derecha || frontal || trasera);
     }
+
+    /* Codigo fallido para hallar los cortes inclinados y poder obtener los puntos de intersección
+
+    bool intersects(double x_start, double x_end,
+                    double y_start, double y_end, double z_start, double z_end){
+
+
+        Punto esq_inf_izq_del(x_start, y_start, z_start);
+        Punto esq_inf_der_del(x_end, y_start, z_start);
+        Punto esq_inf_izq_tras(x_start, y_end, z_start);
+        Punto esq_inf_der_tras(x_end, y_end, z_start);
+
+
+        Punto esq_sup_izq_del(x_start, y_start, z_end);
+        Punto esq_sup_izq_tras(x_start, y_end, z_end);
+        Punto esq_sup_der_del(x_end, y_start, z_end);
+        Punto esq_sup_der_tras(x_end, y_end, z_end);
+
+
+
+        bool frontal, trasera, piso, techo, izquierda, derecha;
+        vector<pair<double, double>> eq_frontal, eq_trasera, eq_piso, eq_techo, eq_izquierda, eq_derecha;
+        vector<pair<vector<pair<double, double>>, string>> ecuaciones;
+
+        //verifico interseccion para cada una de las caras del cubo actual
+
+        frontal = interseccion(l1a,l1b,l2a, esq_inf_der_del, esq_inf_izq_del, esq_sup_der_del, x_start, x_end, y_start, y_end, z_start, z_end,eq_frontal, "frontal");
+        trasera = interseccion(l1a,l1b,l2a, esq_inf_der_tras, esq_inf_izq_tras, esq_sup_der_tras, x_start, x_end, y_start, y_end, z_start, z_end,eq_trasera, "trasera");
+        piso = interseccion(l1a,l1b,l2a, esq_inf_der_tras, esq_inf_izq_tras, esq_inf_der_del, x_start, x_end, y_start, y_end, z_start, z_end,eq_piso, "piso");
+        techo = interseccion(l1a,l1b,l2a, esq_sup_der_tras, esq_sup_izq_tras, esq_sup_der_del, x_start, x_end, y_start, y_end, z_start, z_end,eq_techo, "techo");
+        izquierda = interseccion(l1a,l1b,l2a, esq_sup_izq_tras, esq_inf_izq_tras, esq_sup_izq_del, x_start, x_end, y_start, y_end, z_start, z_end,eq_izquierda, "izquierda");
+        derecha = interseccion(l1a,l1b,l2a, esq_sup_der_tras, esq_inf_der_tras, esq_sup_der_del, x_start, x_end, y_start, y_end, z_start, z_end,eq_derecha, "derecha");
+
+        if(frontal) ecuaciones.push_back({eq_frontal,"frontal"});
+        if(trasera) ecuaciones.push_back({eq_trasera,"trasera"});
+        if(piso) ecuaciones.push_back({eq_piso,"piso"});
+        if(techo) ecuaciones.push_back({eq_techo,"techo"});
+        if(izquierda) ecuaciones.push_back({eq_izquierda,"izquierda"});
+        if(derecha) ecuaciones.push_back({eq_derecha,"derecha"});
+        if(derecha) {cout << "aaaaa" << endl;}
+
+
+
+
+        bool marcados[10][10];
+
+        for (int i = 0; i < 10; ++i) {
+            for (int j = 0; j < 10; ++j) {
+                marcados[i][j] = 0;
+            }
+        }
+
+
+        cout << endl;
+
+//en este doble for hallo las lineas de interseccion que se intersecan entre si para poder hallar un punto valido
+
+        for(auto it: ecuaciones){
+
+            for(auto at: ecuaciones){
+
+                if(it == at){
+                    continue;
+                }else{
+
+                    string cara1, cara2;
+
+                    cara1 = it.second;
+                    cara2 = at.second;
+                    int cc1, cc2;
+
+//asigno un valor numerico a la representacion de cada cara
+
+                    if(cara1 == "frontal") cc1 = 1;
+                    if(cara1 == "trasera") cc1 = 2;
+                    if(cara1 == "piso") cc1 = 3;
+                    if(cara1 == "techo") cc1 = 4;
+                    if(cara1 == "izquierda") cc1 = 5;
+                    if(cara1 == "derecha") cc1 = 6;
+
+                    if(cara2 == "frontal") cc2 = 1;
+                    if(cara2 == "trasera") cc2 = 2;
+                    if(cara2 == "piso") cc2 = 3;
+                    if(cara2 == "techo") cc2 = 4;
+                    if(cara2 == "izquierda") cc2 = 5;
+                    if(cara2 == "derecha") cc2 = 6;
+
+
+
+                    if(marcados[cc1][cc2] || marcados[cc2][cc1]){
+                       continue;
+                    }
+
+        //marco la combinacion de caras valida para sacar los puntos
+
+                    marcados[cc1][cc2] = 1;
+                    marcados[cc2][cc1] = 1;
+                    
+                    double x1, x2, x3, x4, x5, x6;
+                    double a1, a2, a3, a4, a5, a6;
+
+                    // describo las variables de las funciones parametricas de las lineas de interseccion a analizar
+
+                    x1 = it.first[0].first; a1 = it.first[0].second; // x1
+
+                    x2 = it.first[1].first; a2 = it.first[1].second; // y1
+
+                    x3 = it.first[2].first; a3 = it.first[2].second; // z1
+
+                    x4 = at.first[0].first; a4 = at.first[0].second; // x2
+
+                    x5 = at.first[1].first; a5 = at.first[1].second; // y2
+
+                    x6 = at.first[2].first; a6 = at.first[2].second; // z2
+                    
+                    cout << endl;
+                    cout << "x = " << x1 << " + " << a1 << "*t" << endl;
+                    cout << "y = " << x2 << " + " << a2 << "*t" << endl;
+                    cout << "z = " << x3 << " + " << a3 << "*t" << endl;
+                    cout << endl;
+                    cout << "x = " << x4 << " + " << a4 << "*t" << endl;
+                    cout << "y = " << x5 << " + " << a5 << "*t" << endl;
+                    cout << "z = " << x6 << " + " << a6 << "*t" << endl;
+                    cout << endl;
+                    
+                    //resuelvo un sistema de ecuaciones para hallar el punto de interseccion entre las lineas R3
+
+                    double res_x, res_y;
+                    bool possible = true;
+                    if ((a1 * (a5*-1)) - ((a4*-1) * a2) == 0){
+                        possible = false;
+                    }
+                    else{
+                        res_x = ((( x4-x1)*(a5*-1)) - ((a4*-1)*(x5-x2)))/((a1*(a5*-1))-((a4*-1)*a2));
+                        res_y = ((a1*(x5-x2)) - ((x4-x1)*a2)) / ((a1*(a5*-1)) - ((a4*-1)*a2));
+                        //cout << "x=" << res_x << " y=" << res_y << endl;
+                    }
+
+
+                    if(!possible){
+                        continue;
+                    }
+
+                    //termino de hallar la funcion 
+
+                    double z1 = a3*res_x + (a6*-1)*res_y;
+                    double z2 = x6-x3;
+
+                   // cout << z1 << " " << z2 << endl;
+
+                    double finalx, finaly, finalz;
+
+                    //hallo las coordenadas faltantes con el alfa y beta correspondiente
+
+                    finalx = x1 + a1*res_x;
+                    finaly = x2 + a2*res_x;
+
+                    finalz = x3 + a3*res_x;
+                    //este es el punto de interseccion de las lineas 
+
+                    cout << "__________" << endl;
+                    cout << cara1 << " y " << cara2 << endl;
+                    cout << "x=" << (finalx) << " y=" << (finaly) << " z=" << (finalz) <<  endl;
+                    cout << "__________" << endl;
+                }
+            }
+        }
+
+
+     //   cout << endl;
+
+
+        // frontal = interseccion( );
+
+
+    }
+    bool findpuntos(Punto a1, Punto b1, Punto c1, Punto a2, Punto b2, Punto c2, int coor, double c_start, double c_end) {
+        //ecuacion plano 1;
+        auto p1 = a1 - b1;
+        auto p2 = a1 - c1;
+        auto p3 = p1 * p2;
+        auto A1 = p3.x;
+        auto B1 = p3.y;
+        auto C1 = p3.z;
+        Punto plano1(A1, B1, C1);
+        auto D1 = (A1 * a1.x + B1 * a1.y + C1 * a1.z);
+        auto g1 = a2 - b2;
+        auto g2 = a2 - c2;
+        auto g3 = g1 * g2;
+        auto A2 = g3.x;
+        auto B2 = g3.y;
+        auto C2 = g3.z;
+        Punto plano2(A2, B2, C2);
+        auto D2 = (A2 * a2.x + B2 * a2.y + C2 * a2.z);
+        Punto linea = plano1 * plano2;
+        auto A3 = linea.x;
+        auto B3 = linea.y;
+        auto C3 = linea.z;
+        
+        //A1*x + B1*y + C1*z = D1
+        // A2*x + B2*y + C2*z = D2
+        // A3*x + B3*y + C3*z = 0
+         
+        double coeff[3][4] = {{A1, B1, C1, D1},{A2, B2, C2, D2},{A3, B3, C3, 0},};
+        double xi, yi, zi;
+        findSolution(coeff, xi, yi, zi);
+
+    }
+
+    */
 
 };
 
@@ -724,6 +888,45 @@ vector< vector<Punto> > puntos = {
     {a65, a66, a67, a68},
     {a69, a70, a71, a72},
     {a73, a74, a75, a76}
+};
+
+Punto c1(511, 0, 19);
+Punto c2(0, 0, 19);
+Punto c3(511, 511, (int) 39.0/1.5);
+Punto c4(0, 511, (int) 39.0/1.5);
+
+Punto c5(0,400,38);
+Punto c6(511,400,38);
+Punto c7(0,0,0);
+Punto c8(511,0,0);
+
+Punto c9(300,0,38);
+Punto c10(300,511,38);
+Punto c11(50,0,0);
+Punto c12(50,511,0);
+
+Punto c13(0,250,38);
+Punto c14(511,250,38);
+Punto c15(0,50,0);
+Punto c16(511,50,0);
+
+Punto c17(0,250,38);
+Punto c18(511,250,38);
+Punto c19(0,100,0);
+Punto c20(511,100,0);
+
+Punto c21(0,511,15);
+Punto c22(0,0,15);
+Punto c23(500,511,0);
+Punto c24(500,0,0);
+
+vector< vector<Punto> > planosInclinados = {
+    {c1, c2, c3, c4},
+    {c5, c6, c7, c8},
+    {c9, c10, c11, c12},
+    {c13, c14, c15, c16},
+    {c17, c18, c19, c20},
+    {c21, c22, c23, c24}
 };
 
 #endif

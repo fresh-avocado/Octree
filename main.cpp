@@ -72,6 +72,21 @@ int main() {
         string msg = "Tiempo promedio de ejecución de 'getCorte': " + to_string(sum/20) + " us.\n";
         print_colorful(VERDE, msg);
 
+        print_with_color(VERDE, "Desea probar el Cubo con planos inclinados? [y/n]");
+        string opt;
+        cin >> opt;
+        if (opt == "y") {
+            for (int i = 0; i < 6; ++i) {
+                CImg<float>* temp = cubo->getCorte(planosInclinados[i][0], planosInclinados[i][1], planosInclinados[i][2], planosInclinados[i][3]);
+                temp->display();
+            }
+        } else if (opt == "n") {
+            print_with_color(AZUL, "Ok.");
+        } else {
+            print_with_color(ROJO, "Opción inválida.");
+        }
+
+
         delete cubo;
     } else {
         print_with_color(ROJO, "Opción inválida.");
