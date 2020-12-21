@@ -114,8 +114,8 @@ public:
                     for (const auto& punto : puntos) {
                         minX = min(minX, (int) punto.x);
                         maxX = max(maxX, (int) punto.x);
-                        minY = min(minY, (int) abs( (plano->getMaxZ() - plano->getMinZ()) - punto.y) );
-                        maxY = max(maxY, (int) abs( (plano->getMaxZ() - plano->getMinZ()) - punto.y) );
+                        minY = min(minY, (int) abs( (plano->getMaxZ() - plano->getMinZ()) - punto.z) );
+                        maxY = max(maxY, (int) abs( (plano->getMaxZ() - plano->getMinZ()) - punto.z) );
                     }
                 } else if (paralelidad == "yz") {
                     for (const auto& punto : puntos) {
